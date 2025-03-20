@@ -74,8 +74,15 @@ const ChatInterface: React.FC = () => {
   const isLecturer = getUserRole() === "lecturer";
 
   // Format timestamp
-  const formatTime = (timestamp: number) => {
-    return moment(timestamp).format("MMM D, YYYY h:mm A");
+  const formatTime = (timestamp: number | null | undefined) => {
+    if (!timestamp) return "Just now";
+
+    try {
+      return moment(timestamp).format("MMM D, YYYY h:mm A");
+    } catch (error) {
+      console.error("Error formatting timestamp:", error);
+      return "Unknown time";
+    }
   };
 
   return (
@@ -147,7 +154,15 @@ const ChatInterface: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-muted">No chat groups available</div>
+                <div className="text-center py-3">
+                  <i className="bi bi-chat-square-text fs-4 text-muted mb-2"></i>
+                  <p className="text-muted mb-0">No chat groups available</p>
+                  <small className="text-muted d-block mt-2">
+                    {isLecturer
+                      ? "You haven't created any chat groups yet."
+                      : "You need to be enrolled in courses to see their chat groups."}
+                  </small>
+                </div>
               )}
             </div>
           </div>
@@ -281,7 +296,24 @@ const ChatInterface: React.FC = () => {
           ) : (
             <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
               <i className="bi bi-chat-dots fs-1 mb-3"></i>
-              <p>Select a chat group to start messaging</p>
+              <p className="mb-2">Select a chat group to start messaging</p>
+              {chatGroups.length === 0 && (
+                <div className="text-center">
+                  <small className="d-block text-muted">
+                    {isLecturer
+                      ? "You need to create a chat group first."
+                      : "No chat groups are available for your courses."}
+                  </small>
+                  {!isLecturer && (
+                    <div className="alert alert-info mt-3 small" role="alert">
+                      <i className="bi bi-info-circle me-2"></i>
+                      Chat groups are created by lecturers. If you're enrolled
+                      in courses but don't see any chats, ask your lecturer to
+                      create one.
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

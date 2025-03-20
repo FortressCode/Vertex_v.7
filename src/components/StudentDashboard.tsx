@@ -283,6 +283,8 @@ export default function StudentDashboard() {
         return renderDashboardSection();
       case "schedule":
         return renderScheduleSection();
+      case "classes":
+        return renderClassesSection();
       case "courses":
         return renderCoursesSection();
       case "materials":
@@ -582,13 +584,8 @@ export default function StudentDashboard() {
         Learning Materials
       </div>
 
-      {/* Materials content would go here */}
-      <div className="text-center py-5">
-        <i className="bi bi-folder fs-1 text-muted"></i>
-        <p className="mt-3 text-muted">
-          Your learning materials will appear here
-        </p>
-      </div>
+      {/* Use MaterialsViewer component */}
+      <MaterialsViewer role="student" />
     </div>
   );
 
@@ -999,7 +996,7 @@ export default function StudentDashboard() {
       </div>
       <div className="row">
         <div className="col-md-12">
-          <div className="card">
+          <div className="card h-100">
             <div className="card-body p-0">
               <ChatInterface />
             </div>
@@ -1054,7 +1051,9 @@ export default function StudentDashboard() {
                               className="spinner-border spinner-border-sm text-primary me-2"
                               role="status"
                             >
-                              <span className="visually-hidden">Loading...</span>
+                              <span className="visually-hidden">
+                                Loading...
+                              </span>
                             </div>
                             Loading schedule...
                           </div>
