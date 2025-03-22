@@ -5,7 +5,9 @@ import React, {
   ReactNode,
   useCallback,
   useRef,
+  useEffect,
 } from "react";
+import { auth } from "../firebase";
 
 // Define the notification structure
 export interface Notification {
@@ -19,6 +21,7 @@ interface NotificationContextType {
   notifications: Notification[];
   showNotification: (message: string) => void;
   dismissNotification: (id: string) => void;
+  clearAllNotifications: () => void;
 }
 
 // Create the context
@@ -53,8 +56,33 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   // Track message history to prevent duplicates even after dismissal
   const recentMessages = useRef<Map<string, number>>(new Map());
 
+  // Function to clear all notifications
+  const clearAllNotifications = useCallback(() => {
+    // Clear all timeouts
+    Object.values(timeoutRefs.current).forEach(clearTimeout);
+    timeoutRefs.current = {};
+
+    // Clear all notifications
+    setNotifications([]);
+
+    // Clear recent messages
+    recentMessages.current.clear();
+  }, []);
+
+  // Listen for authentication state changes
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        // User has logged out, clear all notifications
+        clearAllNotifications();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [clearAllNotifications]);
+
   // Clean up timeouts and message history when unmounting
-  React.useEffect(() => {
+  useEffect(() => {
     // Set interval to clean up old message history entries
     const cleanupInterval = setInterval(() => {
       const now = Date.now();
@@ -148,6 +176,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     notifications,
     showNotification,
     dismissNotification,
+    clearAllNotifications,
   };
 
   return (

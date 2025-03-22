@@ -3,10 +3,12 @@ import {
   useNotification,
   Notification as NotificationType,
 } from "../contexts/NotificationContext";
+import { useAuth } from "../contexts/AuthContext";
 import "../styles/Notification.css";
 
 const Notification: React.FC = () => {
   const { notifications, dismissNotification } = useNotification();
+  const { currentUser } = useAuth();
 
   const handleDismiss = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
@@ -38,8 +40,8 @@ const Notification: React.FC = () => {
     [dismissNotification]
   );
 
-  // Render nothing if no notifications
-  if (notifications.length === 0) {
+  // Render nothing if no notifications or if user is not logged in
+  if (notifications.length === 0 || !currentUser) {
     return null;
   }
 
